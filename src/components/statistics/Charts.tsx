@@ -9,7 +9,7 @@ import { Time } from '../../shared/time'
 
 const DAY = 24 * 3600 * 1000
 
-type Data1Item = { happen_at: string; amount: number }
+type Data1Item = { happened_at: string; amount: number }
 type Data1 = Data1Item[]
 type Data2Item = { tag_id: number; tag: Tag; amount: number }
 type Data2 = Data2Item[]
@@ -25,7 +25,7 @@ export const Charts = defineComponent({
     }
   },
   setup: (props, context) => {
-    const kind = ref('expenses')
+    const kind = ref('expense')
     const data1 = ref<Data1>([])
     const betterData1 = computed<[string, number][]>(() => {
       if (!props.startDate || !props.endDate) {
@@ -36,26 +36,27 @@ export const Charts = defineComponent({
       return Array.from({ length: n }).map((_, i) => {
         const time = new Time(props.startDate + 'T00:00:00.000+0800').add(i, 'day').getTimestamp()
         const item = data1.value[0]
-        const amount = item && new Date(item.happen_at+'T00:00:00.000+0800').getTime() === time ? data1.value.shift()!.amount : 0
+        const amount =
+          item && new Date(item.happened_at + 'T00:00:00.000+0800').getTime() === time ? data1.value.shift()!.amount : 0
         return [new Date(time).toISOString(), amount]
       })
     })
 
     const fetchData1 = async () => {
-      const response = await http.get<{ groups: Data1; summary: number }>(
+      const response = await http.get<{ resources: Data1; total: number }>(
         '/items/summary',
         {
-          happen_after: props.startDate,
-          happen_before: props.endDate,
+          happened_after: `${props.startDate} 00:00:00`,
+          happened_before: `${props.endDate} 23:59:59`,
           kind: kind.value,
-          group_by: 'happen_at'
+          group_by: 'happened_at'
         },
         {
           _mock: 'itemSummary',
           _autoLoading: true
         }
       )
-      data1.value = response.data.groups
+      data1.value = response.data.resources
     }
     onMounted(fetchData1)
     watch(() => kind.value, fetchData1)
@@ -77,11 +78,11 @@ export const Charts = defineComponent({
     })
 
     const fetchData2 = async () => {
-      const response = await http.get<{ groups: Data2; summary: number }>(
+      const response = await http.get<{ resources: Data2; total: number }>(
         '/items/summary',
         {
-          happen_after: props.startDate,
-          happen_before: props.endDate,
+          happened_after: `${props.startDate} 00:00:00`,
+          happened_before: `${props.endDate} 23:59:59`,
           kind: kind.value,
           group_by: 'tag_id'
         },
@@ -89,7 +90,7 @@ export const Charts = defineComponent({
           _mock: 'itemSummary'
         }
       )
-      data2.value = response.data.groups
+      data2.value = response.data.resources
     }
     onMounted(fetchData2)
     watch(() => kind.value, fetchData2)
@@ -100,7 +101,7 @@ export const Charts = defineComponent({
           label="类型"
           type="select"
           options={[
-            { value: 'expenses', text: '支出' },
+            { value: 'expense', text: '支出' },
             { value: 'income', text: '收入' }
           ]}
           v-model={kind.value}

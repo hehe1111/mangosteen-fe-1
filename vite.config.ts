@@ -47,7 +47,8 @@ export default defineConfig(({command}) => {
     server: {
       proxy: {
         '/api/v1': {
-          target: 'http://121.196.236.94:3000/',
+          // 不能用 localhost，要用 127.0.0.1，原因未知
+          target: 'http://127.0.0.1:3000/',
         }
       }
     }

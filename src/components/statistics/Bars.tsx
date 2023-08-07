@@ -1,4 +1,4 @@
-import { computed, defineComponent, PropType, reactive } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { Money } from '../../shared/Money';
 import s from './Bars.module.scss';
 export const Bars = defineComponent({

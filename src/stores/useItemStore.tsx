@@ -26,8 +26,8 @@ export const useItemStore = (id: string | (string | undefined)[]) =>
         const response = await http.get<Resources<Item>>(
           '/items',
           {
-            happen_after: startDate,
-            happen_before: endDate,
+            happened_after: `${startDate} 00:00:00`,
+            happened_before: `${endDate} 23:59:59`,
             page: firstPage ? 1 : this.page + 1
           },
           {
@@ -35,13 +35,13 @@ export const useItemStore = (id: string | (string | undefined)[]) =>
             _autoLoading: true
           }
         )
-        const { resources, pager } = response.data
+        const { resources, page, per, count } = response.data
         if (firstPage) {
           this.items = resources
         } else {
           this.items.push(...resources)
         }
-        this.hasMore = (pager.page - 1) * pager.per_page + resources.length < pager.count
+        this.hasMore = (Number(page) - 1) * per + resources.length < count
         this.page += 1
       },
       async fetchNextPage(startDate, endDate) {

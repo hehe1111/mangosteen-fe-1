@@ -1,5 +1,5 @@
-import { defineComponent, PropType } from 'vue';
-import { RouteLocationRaw, RouterLink } from 'vue-router';
+import { defineComponent } from 'vue';
+import { RouterLink } from 'vue-router';
 import s from './SkipFeatures.module.scss';
 export const SkipFeatures = defineComponent({
   setup: (props, context) => {

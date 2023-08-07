@@ -1,4 +1,4 @@
-import { defineComponent, PropType } from 'vue';
+import { defineComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Icon } from './Icon';
 export const BackIcon = defineComponent({

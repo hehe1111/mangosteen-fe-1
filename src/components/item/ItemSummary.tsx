@@ -1,5 +1,5 @@
-import { defineComponent, onMounted, onUnmounted, PropType, reactive, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
+import { defineComponent, PropType, reactive, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { useAfterMe } from '../../hooks/useAfterMe'
 import { Button } from '../../shared/Button'
 import { Center } from '../../shared/Center'
@@ -9,7 +9,6 @@ import { http } from '../../shared/Http'
 import { Icon } from '../../shared/Icon'
 import { Money } from '../../shared/Money'
 import { useItemStore } from '../../stores/useItemStore'
-import { useMeStore } from '../../stores/useMeStore'
 import s from './ItemSummary.module.scss'
 export const ItemSummary = defineComponent({
   props: {
@@ -34,8 +33,14 @@ export const ItemSummary = defineComponent({
       }
     )
 
+    const route = useRoute()
+    watch(() => [route.path], () => {
+      // 切换到其他页面之前，重置当前页面数据，避免从其他页面切换回来时，分页信息累加
+      itemStore.$reset()
+    })
+
     const itemsBalance = reactive({
-      expenses: 0,
+      expense: 0,
       income: 0,
       balance: 0
     })
@@ -46,8 +51,8 @@ export const ItemSummary = defineComponent({
       const response = await http.get(
         '/items/balance',
         {
-          happen_after: props.startDate,
-          happen_before: props.endDate
+          happened_after: `${props.startDate} 00:00:00`,
+          happened_before: `${props.endDate} 23:59:59`
         },
         {
           _mock: 'itemIndexBalance'
@@ -60,7 +65,7 @@ export const ItemSummary = defineComponent({
       () => [props.startDate, props.endDate],
       () => {
         Object.assign(itemsBalance, {
-          expenses: 0,
+          expense: 0,
           income: 0,
           balance: 0
         })
@@ -81,7 +86,7 @@ export const ItemSummary = defineComponent({
                 </li>
                 <li>
                   <span>支出</span>
-                  <Money value={itemsBalance.expenses} />
+                  <Money value={itemsBalance.expense} />
                 </li>
                 <li>
                   <span>净收入</span>
@@ -97,12 +102,14 @@ export const ItemSummary = defineComponent({
                     <div class={s.text}>
                       <div class={s.tagAndAmount}>
                         <span class={s.tag}>{item.tags && item.tags.length > 0 ? item.tags[0].name : '未分类'}</span>
-                        <span class={s.amount}>
+                        {/* <span class={s.amount}> */}
+                        <span>
+                          <span>{item.kind === 'income' ? '+' : '-'}</span>
                           ￥<Money value={item.amount} />
                         </span>
                       </div>
                       <div class={s.time}>
-                        <Datetime value={item.happen_at} />
+                        <Datetime value={item.happened_at} />
                       </div>
                     </div>
                   </li>

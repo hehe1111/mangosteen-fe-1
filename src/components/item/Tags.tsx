@@ -1,4 +1,4 @@
-import { defineComponent, onUpdated, PropType, ref } from 'vue';
+import { defineComponent, PropType, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { Button } from '../../shared/Button';
 import { http } from '../../shared/Http';
