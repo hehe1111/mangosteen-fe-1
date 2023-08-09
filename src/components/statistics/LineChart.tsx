@@ -1,6 +1,6 @@
 import { defineComponent, onMounted, PropType, ref, watch } from 'vue'
 import s from './LineChart.module.scss'
-import * as echarts from 'echarts'
+import echarts from './EChartsInit'
 import { Time } from '../../shared/time'
 import { getMoney } from '../../shared/Money'
 
